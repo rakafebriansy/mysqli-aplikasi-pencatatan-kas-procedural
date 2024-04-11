@@ -7,7 +7,7 @@ require_once 'app/Helpers/Helper.php';
 $mysqli = getConnection();
 $nama = $_POST['nama'];
 $tanggal_pembayaran = $_POST['tanggal'];
-$nominal = (int)$_POST['nominal'];
+$nominal = $_POST['nominal'];
 
 try {
     tambahKas($mysqli, $nama, $tanggal_pembayaran, $nominal);

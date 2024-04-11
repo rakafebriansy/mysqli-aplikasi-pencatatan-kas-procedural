@@ -1,7 +1,8 @@
 <?php
 
-function tambahKas(\mysqli $connection, string $nama, string $tanggal_pembayaran, int $nominal): int
+function tambahKas(\mysqli $connection, string $nama, string $tanggal_pembayaran, string $nominal): int
 {
+    $nominal = intval($nominal);
     validateKas($nama, $tanggal_pembayaran, $nominal);
     mysqli_begin_transaction($connection);
     try {
@@ -44,13 +45,13 @@ function hapusKas(\mysqli $connection, int $id): void
         throw $e;
     }
 }
-function ubahKas(\mysqli $connection, int $id, string $nama, string $tanggal_pembayaran, int $nominal): void
+function ubahKas(\mysqli $connection, int $id, string $nama, string $tanggal_pembayaran, string $nominal): void
 {
     validateKas($nama, $tanggal_pembayaran, $nominal);
     mysqli_begin_transaction($connection);
     try {
         $stmt = mysqli_prepare($connection, 'UPDATE kas SET nama = ?, tanggal_pembayaran = ?, nominal = ? WHERE id = ?');
-        mysqli_stmt_bind_param($stmt, 'sssi', $nama, $tanggal_pembayaran, $nominal, $id);
+        mysqli_stmt_bind_param($stmt, 'ssii', $nama, $tanggal_pembayaran, $nominal, $id);
         $stmt->execute();
         mysqli_commit($connection);
     } catch (\Exception $e) {
@@ -78,13 +79,16 @@ function jumlahKasPerBulan(\mysqli $connection): string
         throw $e;
     }
 }
-function validateKas(string $nama, string $tanggal_pembayaran, int $nominal): void
+function validateKas(string $nama, string $tanggal_pembayaran, string $nominal): void
 {
     if ($nama == null || trim($nama) == '') {
         throw new \Exception('Nama tidak boleh kosong!');
     }
     if ($tanggal_pembayaran == null || trim($tanggal_pembayaran) == '') {
         throw new \Exception('tanggal_pembayaran tidak boleh kosong!');
+    }
+    if (!is_numeric($nominal)){
+        throw new \Exception('Nominal harus angka!');
     }
     if ($nominal == null || $nominal == 0) {
         throw new \Exception('Nominal tidak boleh nol!');
